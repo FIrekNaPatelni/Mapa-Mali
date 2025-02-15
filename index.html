@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="logo.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Mali</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        h1 {
+            
+            display: inline-block;
+            margin-left: 20px;
+        }
+        button{
+            height: 35px;
+            width: 80px;
+            border-radius: 25px;
+            border: none;
+            color: rgb(255, 255, 255);
+            background-color: green;
+        }
+        body, html {font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 0;  cursor: crosshair; background: rgb(255, 255, 255) }
+        #map { width: 100%; height: 96vh; cursor: crosshair; background: rgb(183, 152, 117); }
+        #controls { display: inline-block; background: rgb(255, 255, 255); padding: 10px; border-radius: 5px; z-index: 1000; }
+        #coords { position: absolute; bottom: 10px; left: 10px; background: white; padding: 5px; border-radius: 5px; z-index: 1000; font-size: 14px; }
+        .leaflet-control-attribution.leaflet-control {
+    display: none;
+}
+    </style>
+</head>
+<body>
+
+    <h1>Mapa Mali 7th SOG</h1>
+    <div id="controls">
+        <label><input type="checkbox" id="addPoint">Dodawanie punktów</label>
+        <button id="clearPoints">Delete all</button>
+    </div>
+    <div id="coords">Kordynaty: --</div>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map', {
+            crs: L.CRS.Simple, 
+            minZoom: -2
+        });
+        
+        var bounds = [[0, 0], [1955, 2683]];
+        var image = L.imageOverlay('mapa_mali.png', bounds).addTo(map);
+        map.fitBounds(bounds);
+        
+        var gridLayer = L.gridLayer({ pane: 'tilePane' }).addTo(map);
+        
+        function createGrid() {
+            var interval = 50; 
+
+            for (var x = 0; x <= 2683; x += interval) {
+                L.polyline([[0, x], [1955, x]], { color: 'gray', weight: 1, opacity: 0.5 }).addTo(map);
+            }
+            
+            for (var y = 0; y <= 1955; y += interval) {
+                L.polyline([[y, 0], [y, 2683]], { color: 'gray', weight: 1, opacity: 0.5 }).addTo(map);
+            }
+        }
+        createGrid();
+        
+        var points = [];
+        var lines = [];
+        var addPointMode = document.getElementById('addPoint');
+        var coordsDisplay = document.getElementById('coords');
+        var centerX = 1500;
+        var centerY = 395;
+
+        map.on('mousemove', function(e) {
+            var x = (e.latlng.lng - centerX).toFixed(2);
+            var y = (centerY - e.latlng.lat).toFixed(2);
+            coordsDisplay.textContent = `Kordynaty: X=${x}, Y=${y}`;
+        });
+        
+        map.on('click', function(e) {
+            if (!addPointMode.checked) return;
+            
+            var marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+            points.push(marker);
+            
+            if (points.length > 1) {
+                var lastPoint = points[points.length - 2].getLatLng();
+                var distance = (map.distance(lastPoint, e.latlng) + 200).toFixed(2);
+                var line = L.polyline([lastPoint, e.latlng], { color: 'red' }).addTo(map);
+                lines.push({ line: line, start: lastPoint, end: e.latlng });
+                
+                L.popup()
+                    .setLatLng(e.latlng)
+                    .setContent('Dystans: ' + distance + ' studs')
+                    .openOn(map);
+            }
+            
+            marker.on('click', function() {
+                map.removeLayer(marker);
+                points = points.filter(m => m !== marker);
+                
+                // Usuwanie powiązanych linii
+                lines = lines.filter(l => {
+                    if (l.start.equals(marker.getLatLng()) || l.end.equals(marker.getLatLng())) {
+                        map.removeLayer(l.line);
+                        return false;
+                    }
+                    return true;
+                });
+            });
+        });
+        
+        document.getElementById('clearPoints').addEventListener('click', function() {
+            points.forEach(marker => map.removeLayer(marker));
+            points = [];
+            lines.forEach(l => map.removeLayer(l.line));
+            lines = [];
+        });
+    </script>
+</body>
+</html>

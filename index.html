@@ -226,10 +226,13 @@
             
         });
 
+        var cordsx
+        var cordsy
+
         map.on('mousemove', function(e) {
-            var x = ((e.latlng.lng - centerX)*5).toFixed(2);
-            var y = ((centerY - e.latlng.lat)*5).toFixed(2);
-            coordsDisplay.textContent = `Współrzędne: ${x},${y}`;
+            cordsx = ((e.latlng.lng - centerX)*5).toFixed(2);
+            cordsy = ((centerY - e.latlng.lat)*5).toFixed(2);
+            coordsDisplay.textContent = `Współrzędne: ${cordsx},${cordsy}`;
         });
         
         map.on('click', function(e) {
@@ -299,6 +302,15 @@
                 mapElement.classList.remove("shift-active");
             }
         });
+
+        document.addEventListener("keyup", (event) => {
+            if (event.key === "c" || event.key === "C") {
+                if (cordsx != null && cordsy != null){
+                    navigator.clipboard.writeText(`${Math.round(cordsx)}, 300, ${Math.round(cordsy)}`);
+                }
+            }
+        });
+
 
 
 

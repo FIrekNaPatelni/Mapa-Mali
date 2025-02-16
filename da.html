@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkbox zależności</title>
+</head>
+<body>
+
+    <label>
+        <input type="checkbox" id="checkbox1"> Checkbox 1 (musi być zaznaczony)
+    </label>
+    <br>
+    <label>
+        <input type="checkbox" id="checkbox2" disabled> Checkbox 2 (zależny)
+    </label>
+
+    <script>
+        const checkbox1 = document.getElementById("checkbox1");
+        const checkbox2 = document.getElementById("checkbox2");
+
+        checkbox1.addEventListener("change", () => {
+            checkbox2.disabled = !checkbox1.checked;
+        });
+    </script>
+
+</body>
+</html>

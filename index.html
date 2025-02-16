@@ -333,6 +333,7 @@
         document.addEventListener("keyup", (event) => {
             if (event.key === "c" || event.key === "C") {
                 if (cordsx != null && cordsy != null){
+                    alert("Skopiowano współrzędne");
                     navigator.clipboard.writeText(`${Math.round(cordsx)}, 300, ${Math.round(cordsy)}`);
                 }
             }

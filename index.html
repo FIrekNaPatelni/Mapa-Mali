@@ -31,6 +31,7 @@
             border: 1.5px solid hsl(0, 0%, 38%)
         }
 
+
         button {
             padding: 8px 16px;
             border-radius: 12px;
@@ -68,6 +69,7 @@
             position: relative;
         }
 
+
         #map.ctrl-active {
             cursor: crosshair;
         }
@@ -83,6 +85,31 @@
             font-size: 1rem;
             border: 1.5px solid hsl(0, 0%, 38%)
         }
+
+        @media screen and (max-width: 1000px) {
+            #controls {
+                border-radius: 0px;
+                border: none;
+                width: 100%;
+                white-space: none;
+                display: block
+            }
+            
+            select, input[type="checkbox"] {
+                width: 25%;
+            }
+            #coords{
+                border-radius: 0px;
+                border: none;
+  
+                bottom: 0px;
+                width: 100%; 
+                left: 0;
+                right: 0;
+                text-align: center;  
+                background: white;
+            }
+        }   
 
         .checkbox-container {
             display: flex;
